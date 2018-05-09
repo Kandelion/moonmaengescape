@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iostream>
 #include <string.h>
+#include <malloc.h>
 
 #define MAX_URL 1024
 
@@ -44,48 +45,52 @@ CURLcode curl_read(const std::string& url, std::ostream& os, long timeout = 30)
 	return code;
 }
 
+char *URL_Encode(const char *str) 
+{
+        char *encstr, buf[2+1];
+        unsigned char c;
+        int i, j;
+
+        if(str == NULL) return NULL;
+        if((encstr = (char *)malloc((strlen(str) * 3) + 1)) == NULL) 
+                return NULL;
+
+        for(i = j = 0; str[i]; i++) 
+        {
+                c = (unsigned char)str[i];
+                if((c >= '0') && (c <= '9')) encstr[j++] = c;
+                else if((c >= 'A') && (c <= 'Z')) encstr[j++] = c;
+                else if((c >= 'a') && (c <= 'z')) encstr[j++] = c;
+                else if((c == '@') || (c == '.') || (c == '/') || (c == '\\')
+                        || (c == '-') || (c == '_') || (c == ':') ) 
+                        encstr[j++] = c;
+                else 
+                {
+                        sprintf(buf, "%02x", c);
+                        encstr[j++] = '%';
+                        encstr[j++] = buf[0];
+                        encstr[j++] = buf[1];
+                }
+        }
+        encstr[j] = 0;
+
+        return encstr;
+}
+
 void getURL(char *URL, const char *str){
 	int len = strlen(str);
-	char temp[MAX_URL+10] = {0};
-	char str_cpy[MAX_URL]={0};
+	char* str_cpy;
 
-	strncpy(str_cpy, str, MAX_URL);
-
-	for(int i=0; i<len; i++){
-		switch(str_cpy[i]){
-			case ' ':
-				strcpy(temp, &str_cpy[i+1]);
-				strncpy(&str_cpy[i], "%20", 4);
-				strcat(str_cpy, temp);
-				i+=2;
-				len+=2;
-				break;
-			/*case '.':
-				strcpy(temp, &str_cpy[i+1]);
-				strncpy(&str_cpy[i], "&#46;", 6);
-				strcat(str_cpy, temp);
-				i+=4;
-				len+=4;
-				break;*/
-			default:
-				if(isalpha(str_cpy[i]) == false){
-					if(str_cpy[i]<'0' || str_cpy[i]>'9'){
-						strcpy(temp, &str_cpy[i+1]);
-						strncpy(&str_cpy[i], "%20", 4);
-						strcat(str_cpy, temp);
-						len+=2;
-						i+=2;
-					}
-				}
-
-				break;
-		}
-	}
+	str_cpy = NULL;
+	str_cpy = URL_Encode(str);
 
 	URL[0] = 0;
 	strcat(URL, "https://translation.googleapis.com/language/translate/v2?q=");
 	strcat(URL, str_cpy);
 	strcat(URL, "&target=ko&format=text&key=AIzaSyC27Cydynq2Q7_r8PiwyP4l1hJNSk7Db4Q");
+
+	if(str_cpy != NULL)
+		free(str_cpy);
 }
 
 int main()
