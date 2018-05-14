@@ -1,6 +1,6 @@
 #include "curl/curl.h"
 #include "rapidjson/document.h"
-#include "rapidjson/writter.h"
+#include "rapidjson/writer.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -10,14 +10,18 @@
 #define MAX_URL 1024
 
 using namespace rapidjson;
+using namespace std;
 
-// callback function writes data to a std::ostream
+const char *JsonField[] = {"translatedText", "detectedSourceLanguage"};
+enum FIELD_NAME { RESULT, SRC_LANG };
+
+// callback function writes data to a ostream
 static size_t data_write(void* buf, size_t size, size_t nmemb, void* userp)
 {
 	if(userp)
 	{
-		std::ostream& os = *static_cast<std::ostream*>(userp);
-		std::streamsize len = size * nmemb;
+		ostream& os = *static_cast<ostream*>(userp);
+		streamsize len = size * nmemb;
 		if(os.write(static_cast<char*>(buf), len))
 			return len;
 	}
@@ -28,7 +32,7 @@ static size_t data_write(void* buf, size_t size, size_t nmemb, void* userp)
 /**
  * timeout is in seconds
  **/
-CURLcode curl_read(const std::string& url, std::ostream& os, long timeout = 30)
+CURLcode curl_read(const string& url, ostream& os, long timeout = 30)
 {
 	CURLcode code(CURLE_FAILED_INIT);
 	CURL* curl = curl_easy_init();
@@ -102,29 +106,64 @@ int main()
 	curl_global_init(CURL_GLOBAL_ALL);
 
 	char URL[MAX_URL] ;
+	char src_str[] = "Capstone PRJ is really awesome.";
 	
-	getURL(URL, "Capstone PRJ is really awesome.");
+	getURL(URL, src_str);
 
-	/*std::ofstream ofs("output.html");
+	/*ofstream ofs("output.html");
 	if(CURLE_OK == curl_read(URL, ofs))
 	{
 		// Web page successfully written to file
 	}*/
 
-	std::ostringstream oss;
-	std::string result;
+	ostringstream oss;
+	string result;
+	cout<<"==String Output=="<<endl;
+	cout<<"#source string"<<endl;
+	cout<<src_str<<endl;
+
 	if(CURLE_OK == curl_read(URL, oss))
 	{
 		// Web page successfully written to string
 		result = oss.str();
+		//cout<<"#origin"<<endl;
+		//cout<<result<<endl;
+		cout<<"#translated string"<<endl;
+		
+		Document doc;
+		doc.Parse(result.c_str());
+
+		assert(doc.IsObject());
+		assert(doc["data"].HasMember("translations"));
+
+		Value& t1 = doc["data"];
+		assert(t1.IsObject());
+		Value::MemberIterator it1;
+		//cout<<"IsArray? "<<(bool)t1["translations"].IsArray()<<endl;
+		//cout<<t1["translations"][0].IsObject()<<endl;
+		//t1 = t1["translations"];
+
+
+		it1 = t1["translations"][0].FindMember(JsonField[RESULT]);
+
+		for(int i=0; i<t1["translations"].Size(); i++){
+			if(it1 == t1.MemberEnd())
+				break;
+			else if(strcmp(it1[i].name.GetString(), JsonField[RESULT]) == 0){
+				cout<<it1[i].value.GetString()<<endl;
+			}
+		}
+
+		//cout<<doc<<endl;
+		//cout<<doc["data"].GetString()<<endl;
+		//cout<<"SRC LANG : "<<doc["detectedSourceLanguage"].GetString()<<endl;
 	}
 
-	std::cout<<"==Standard Output=="<<std::endl;
-	std::cout<<"URL : "<<URL<<std::endl;
-	if(CURLE_OK == curl_read(URL, std::cout))
+	/*cout<<"==Standard Output=="<<endl;
+	if(CURLE_OK == curl_read(URL, cout))
 	{
 		// Web page successfully written to standard output (console?)
-	}
+	}*/
 
 	curl_global_cleanup();
 }
