@@ -1,5 +1,5 @@
 main : main.o translator.o
-	g++ -g -o $@ main.o translator.o -lcurl
+	g++ -g -o $@.out main.o translator.o -lcurl
 
 main.o : main.cpp translator.cpp translator.cpp
 	g++ -c $*.cpp
