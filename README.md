@@ -68,10 +68,20 @@
 > * 빌드 / 실행에 파이썬이 요구되며, 특히 빌드 이후 실행시 실행 파일과 파이썬 코드가 모두 존재해야 실행이 가능합니다.  
 > * 다음 패키지의 install이 필요합니다.
 > ```
-> apt-get install python-dev
+> $ sudo apt-get install python-dev
 > ```
 > * 빌드시 헤더 파일을 찾지 못할 경우 (include path 지정이 작동하지 않을 때, 비추천)
 > ```
-> sudo cp /usr/include/python2.7/*.h /usr/include/
+> $ sudo cp /usr/include/python2.7/*.h /usr/include/
+> ```
+> * 실행시 다음 에러가 출력될 때
+> ```
+> > ImportError: No module named google.cloud
+> 
+> $ sudo apt-get install python-pip
+> $ pip install --upgrade google-api-python-client
+> $ sudo python -m pip install google-cloud
+> 
+> > 이후 gcloud init 등을 통해 환경 설정 이후 재실행
 > ```
 > 
