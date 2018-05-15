@@ -20,7 +20,7 @@
 > * __Class name__
 >   * `translator`  
 > * __Visible function__ 
->   * `const char*` `translate` (`const char*`)
+>   * `char*` `translate` (`const char*`)
 >
 > ```
 > translator TR;    //declare class
@@ -48,15 +48,15 @@
 > * __Class name__
 >   * `ocr_vision`  
 > * __Visible function__ 
->   * `const char*` `detect_text` (`const char*`, `const char*`)
+>   * `void` `detect_text` (`char*`, `int`, `const char*`, `const char*`)
 >
 > ```
-> ocr_vision OCR;       //declare class
-> char *result;         //results will be stored here.
-> char *imgpath;        //target image filepath.
+> ocr_vision OCR;           //declare class
+> char result[BUF_SIZE];    //results will be stored here.
+> char *imgpath;            //target image filepath.
 >
 > //'ocr' is python file's name
-> result = OCR.detect_text ( imgpath, "ocr" );
+> OCR.detect_text ( result, BUF_SIZE, imgpath, "ocr" );
 >
 > if(result == NULL)
 >   //ERROR
