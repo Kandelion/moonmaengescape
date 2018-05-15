@@ -1,0 +1,1 @@
+POST https://translation.googleapis.com/language/translate/v2?q=World&target=ko&format=text&source=en&key=AIzaSyC27Cydynq2Q7_r8PiwyP4l1hJNSk7Db4Q
