@@ -20,14 +20,14 @@
 > * __Class name__
 >   * `translator`  
 > * __Visible function__ 
->   * `char*` `translate` (`const char*`)
+>   * `void` `translate` (`char*`, `int`, `const char*`)
 >
 > ```
 > translator TR;    //declare class
 > char* source;     //set your own text at here
-> char* result;     //results will be stored here.
+> char* result[BUF_SIZE];     //results will be stored here.
 > 
-> result = TR.translate ((const char*)source);
+> TR.translate (result, BUF_SIZE, (const char*)source);
 >
 > if (result == NULL)
 >   //ERROR

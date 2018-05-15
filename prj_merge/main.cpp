@@ -2,11 +2,13 @@
 #include "translator.hpp"
 #include <iostream>
 
+#define MAX_STR 4096
+
 int main(){
     ocr_vision OCR_;
     translator TR;
-    char result_ocr[4096];
-    char *result_translation;
+    char result_ocr[MAX_STR];
+    char result_translation[MAX_STR];
 
     char img_name[256];
 
@@ -15,11 +17,11 @@ int main(){
 
     std::cout<<std::endl<<"==result=="<<std::endl;
 
-    OCR_.detect_text(result_ocr, 4096, img_name, "ocr");
+    OCR_.detect_text(result_ocr, MAX_STR, img_name, "ocr");
     std::cout<<"# Detected text"<<std::endl;
     std::cout<<result_ocr<<std::endl;
 
-    result_translation = TR.translate((const char*)result_ocr);
+    TR.translate(result_translation, MAX_STR, (const char*)result_ocr);
     std::cout<<"# Translated text"<<std::endl;
     std::cout<<result_translation<<std::endl;
 
