@@ -93,7 +93,7 @@ void translator::getURL(char *URL, const char *str){
 		free(str_cpy);
 }
 
-char* translator::translate(const char *src_str)
+void translator::translate(char* result, int result_size, const char *src_str)
 {
 	curl_global_init(CURL_GLOBAL_ALL);
 
@@ -103,7 +103,7 @@ char* translator::translate(const char *src_str)
 	getURL(URL, src_str);
 
 	ostringstream oss;
-	string result;
+	string result_;
 	#if DEBUG == 1
 	cout<<"==String Output=="<<endl;
 	cout<<"#source string"<<endl;
@@ -113,13 +113,13 @@ char* translator::translate(const char *src_str)
 	if(CURLE_OK == curl_read(URL, oss))
 	{
 		// Web page successfully written to string
-		result = oss.str();
+		result_ = oss.str();
 		#if DEBUG == 1
 		cout<<"#translated string"<<endl;
 		#endif
 		
 		Document doc;
-		doc.Parse(result.c_str());
+		doc.Parse(result_.c_str());
 
 		assert(doc.IsObject());
 		assert(doc["data"].HasMember("translations"));
@@ -137,12 +137,13 @@ char* translator::translate(const char *src_str)
 				#if DEBUG == 1
 				cout<<it1[i].value.GetString()<<endl;
 				#endif
-				return (char *)(it1[i].value.GetString());
+				strncpy(result, it1[i].value.GetString(), result_size);
+				return;
 			}
 		}
 	}
 
 	curl_global_cleanup();
 
-	return NULL;
+	result[0] = 0;
 }
