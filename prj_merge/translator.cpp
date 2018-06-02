@@ -1,8 +1,10 @@
 #include "translator.hpp"
-
+#include <string>
 const char *JsonField[] = { "translatedText", "detectedSourceLanguage"};
 enum FIELD_NAME { RESULT, SRC_LANG };
-
+string delimiter = "\n";
+SV sv[4096];
+int numsv = 0;
 // callback function writes data to a ostream
 size_t translator::data_write(void* buf, size_t size, size_t nmemb, void* userp)
 {
@@ -109,7 +111,7 @@ void translator::translate(char* result, int result_size, const char *src_str)
 	cout<<"#source string"<<endl;
 	cout<<src_str<<endl;
 	#endif
-
+	
 	if(CURLE_OK == curl_read(URL, oss))
 	{
 		// Web page successfully written to string
@@ -117,19 +119,16 @@ void translator::translate(char* result, int result_size, const char *src_str)
 		#if DEBUG == 1
 		cout<<"#translated string"<<endl;
 		#endif
-		
 		Document doc;
-		doc.Parse(result_.c_str());
-
-		assert(doc.IsObject());
+		doc.Parse(result_.c_str());// c style char*으로 변환
+		assert(doc.IsObject()); //debugging 용 : false 이면 프로그램 종료
 		assert(doc["data"].HasMember("translations"));
 
 		Value& t1 = doc["data"];
 		assert(t1.IsObject());
 		Value::MemberIterator it1;
-
+		
 		it1 = t1["translations"][0].FindMember(JsonField[RESULT]);
-
 		for(int i=0; i<t1["translations"].Size(); i++){
 			if(it1 == t1.MemberEnd())
 				break;
@@ -138,6 +137,37 @@ void translator::translate(char* result, int result_size, const char *src_str)
 				cout<<it1[i].value.GetString()<<endl;
 				#endif
 				strncpy(result, it1[i].value.GetString(), result_size);
+				string copyresult;
+				copyresult.assign(result, result_size);
+				size_t pos = 0;
+				int count = -1;
+				string token;
+				while((pos = copyresult.find(delimiter)) != std::string::npos) {
+					token = copyresult.substr(0, pos);
+					count = (count + 1);
+					if(count == 5){
+						numsv++;
+						count = count % 5;
+					}
+					copyresult.erase(0, pos + delimiter.length());
+					if (count == 0) {
+						if(token.length() != 0)
+							strncpy(sv[numsv].str, token.c_str(), token.length());
+						else 
+							strncpy(sv[numsv].str, "#", 1);
+					}
+					else if(count == 1)
+						sv[numsv].x1 = atoi(token.c_str());
+					else if(count == 2)
+						sv[numsv].y1 = atoi(token.c_str());
+					else if(count == 3)
+						sv[numsv].x2 = atoi(token.c_str());
+					else
+						sv[numsv].y2 = atoi(token.c_str());	
+	
+				}
+				numsv++;
+				
 				return;
 			}
 		}
@@ -146,4 +176,5 @@ void translator::translate(char* result, int result_size, const char *src_str)
 	curl_global_cleanup();
 
 	result[0] = 0;
+	
 }
