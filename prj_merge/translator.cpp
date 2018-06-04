@@ -176,5 +176,5 @@ void translator::translate(char* result, int result_size, const char *src_str)
 	curl_global_cleanup();
 
 	result[0] = 0;
-	
+
 }

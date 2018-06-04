@@ -9,7 +9,7 @@
 #include <iostream>
 #include <string.h>
 #include <malloc.h>
-#define MAX_URL 1024*5
+#define MAX_URL 1024*10
 #define DEBUG 0
 
 using namespace rapidjson;
