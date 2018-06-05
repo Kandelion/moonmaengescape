@@ -58,8 +58,6 @@ int main(){
         }
 
         img_cnt -= IMG_TERM * 2;
-        std::cout<<"cur file : "<<img_name<<endl;
-        //std::cout<<"prev_cnt : "<<prev_cnt<<endl;
 
         if(img_cnt < prev_cnt){
             img_cnt = prev_cnt;
@@ -68,7 +66,12 @@ int main(){
 
         get_filepath(img_name, img_cnt);
 
-        if(access(img_name, R_OK) == 0){
+        std::cout<<"cur file : "<<img_name<<endl;
+        //std::cout<<"prev_cnt : "<<prev_cnt<<endl;
+        
+        ifstream in(img_name);
+
+        if(in.good() == true){
             prev_cnt = img_cnt;
             count--;
             start = clock();
@@ -93,10 +96,12 @@ int main(){
                     count = 10;
                 }
                 else if(continues == 'e' || continues == 'E'){
+                    in.close();
                     break;
                 }
             }
         }
+        in.close();
     }
     return 0;
 }
@@ -110,5 +115,5 @@ void get_filepath(char *str, int count){
     sprintf(file_cnt, "%05d", count);
     strncat(str, "/Pictures/snap", 256);
     strncat(str, file_cnt, 256);
-    strncat(str, ".png", 256);
+    strncat(str, ".jpg", 256);
 }
