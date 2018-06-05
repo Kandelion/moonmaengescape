@@ -1,18 +1,4 @@
-#include <gtk/gtk.h>
-#include<stdio.h>
-#include<stdlib.h>
-
-static void screen_changed(GtkWidget *widget, GdkScreen *old_screen, gpointer user_data);
-static gboolean draw(GtkWidget *widget, cairo_t *new_cr, gpointer user_data);
-
-
-int MAX_LABEL = 2000;
-
-GtkWidget* fixed_container;
-GtkWidget** label;
-char * data = "youhoo";
-int temp = 0;
-gboolean supports_alpha = FALSE;
+#include "output.hpp"
 
 int main(int argc, char **argv)
 {
@@ -100,8 +86,9 @@ static gboolean draw(GtkWidget *window, cairo_t *cr, gpointer userdata)
     printf("drawing Start ! \n");
 
     for(int i=0; i<MAX_LABEL; i++) {
-        gtk_label_set_markup(GTK_LABEL(label[i]), data);
-        gtk_fixed_move (GTK_FIXED(fixed_container), label[i], 10+temp, i);
+        //gtk_label_set_markup(GTK_LABEL(label[i]), data);
+        gtk_label_set_markup(GTK_LABEL(label[i]), "<span foreground=\"red\" background=\"#00FF007F\" font=\"30.5\"><b>Test Text 1</b></span>");
+        gtk_fixed_move (GTK_FIXED(fixed_container), label[i], 10+temp, i/2);
     }
     
     if( temp++ > 1000 ) temp = 0;
