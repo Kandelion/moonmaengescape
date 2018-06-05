@@ -25,6 +25,10 @@ static void screen_changed(GtkWidget *widget, GdkScreen *old_screen, gpointer us
 static gboolean draw(GtkWidget *window, cairo_t *cr, gpointer userdata)
 {
    cairo_t *new_cr = gdk_cairo_create(gtk_widget_get_window(window));
+   char str_tmp[300] = { '0', };
+   char color[20] = "RED";
+   char bgcolor[20] = "#00FF007F";
+   char font_size[20] = "20";
 
     if (supports_alpha)
     {
@@ -47,10 +51,23 @@ static gboolean draw(GtkWidget *window, cairo_t *cr, gpointer userdata)
 
     printf("drawing Start ! \n");
 
-    for(int i=0; i<MAX_LABEL; i++) {
+    for(int i=0; i<(*num_ptr); i++) {
+        if(s_ptr[i].str[0] == NULL) break;
+
         //gtk_label_set_markup(GTK_LABEL(label[i]), data);
-        gtk_label_set_markup(GTK_LABEL(label[i]), "<span foreground=\"red\" background=\"#00FF007F\" font=\"30.5\"><b>Test Text 1</b></span>");
-        gtk_fixed_move (GTK_FIXED(fixed_container), label[i], 10+temp, i/2);
+        strcpy(str_tmp, "<span foreground=\"");
+        strcat(str_tmp, color);
+        strcat(str_tmp, \" background=\"");
+        strcat(str_tmp, bg_color);
+        strcat(str_tmp, "\" font=\"");
+        strcat(str_tmp, font_size);
+        strcat(str_tmp, "\"><b>");
+        strcat(str_tmp, s_ptr[i].str);
+        strcat(str_tmp, "</b></span>");
+        
+        //gtk_label_set_markup(GTK_LABEL(label[i]), "<span foreground=\"red\" background=\"#00FF007F\" font=\"30.5\"><b>Test Text 1</b></span>");
+        gtk_label_set_markup(GTK_LABEL(label[i]), str_tmp);
+        gtk_fixed_move (GTK_FIXED(fixed_container), label[i], s_ptr[i].x, s_ptr[i].y);
     }
     
     if( temp++ > 1000 ) temp = 0;
@@ -62,7 +79,7 @@ static gboolean draw(GtkWidget *window, cairo_t *cr, gpointer userdata)
     return FALSE;
 }
 
-void output::output_init(void) { // class에 구현할 아웃푸웃
+void output::output_init(SV* struct_ptr, int* int_ptr) { // class에 구현할 아웃푸웃
     gtk_init(NULL, NULL);
     fixed_container = gtk_fixed_new();
 
@@ -71,6 +88,10 @@ void output::output_init(void) { // class에 구현할 아웃푸웃
         label[i] = gtk_label_new(NULL);
         gtk_fixed_put (GTK_FIXED (fixed_container), label[i], 0, 0); 
     }
+
+        // pointer fetching.
+    s_ptr = struct_ptr;
+    num_ptr = int_ptr;
     
         // window init setting.
     printf("start initializing the gtk. \n");
