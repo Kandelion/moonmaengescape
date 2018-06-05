@@ -2,12 +2,10 @@
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
-
 import argparse
 import io
 
 from google.cloud import vision
-
 def detect_text(path):
     #path = "test.jpg"
 
@@ -22,17 +20,52 @@ def detect_text(path):
 
     response = client.text_detection(image=image)
     texts = response.text_annotations
-    #print('Texts:')
 
+    #첫번째 인접 처리 구문가져오기
+    parse_list = []
     for text in texts:
-        #print( '\n"{}"'.format(text.description) ) # 무슨 문자 써졌는지 표시.
-        return text.description
-        break
+	parse_list = text.description.split("\n")
+	break;
+ 
+    result = ""
+    first_flag = 0
+    second_flag = 0
+    up_flag = down_flag = 0
+    list_idx = 0
+    temp_up_x = temp_up_y = temp_down_x = temp_down_y = ""
+    string_temp = ""
+    for text in texts:
+		
+	# 첫 description 빼기
+	if first_flag == 0:
+		first_flag = 1
+		continue
+	# 단어 집합의 왼쪽 위 좌표 저장
+	if second_flag == 0:
+		temp_up_x = str(text.bounding_poly.vertices[0].x)
+		temp_up_y = str(text.bounding_poly.vertices[0].y)
+		second_flag = 1
 
-        #vertices = (['({},{})'.format(vertex.x, vertex.y) # 좌표 형식으로 분단.
-                    #for vertex in text.bounding_poly.vertices])
+	if parse_list[list_idx].find(text.description) != -1 and len(string_temp) < len(parse_list[list_idx]) :
+		string_temp += text.description
+		#temp_down_x = str(text.bounding_poly.vertices[2].x)
+		#temp_down_y = str(text.bounding_poly.vertices[2].y)	
+	else :
+		result += parse_list[list_idx] + '\n' + temp_up_x + '\n' +  temp_up_y + '\n' +  temp_down_x + '\n' +  temp_down_y + '\n'
+		string_temp = text.description
+		temp_up_x = str(text.bounding_poly.vertices[0].x)
+		temp_up_y = str(text.bounding_poly.vertices[0].y)
+		list_idx += 1	
+	temp_down_x = str(text.bounding_poly.vertices[2].x)
+	temp_down_y = str(text.bounding_poly.vertices[2].y)	
 
-        #print('bounds: {}'.format(','.join(vertices))) # 양 4사이드 좌표 표시.
-
+	#print temp_up_x +  ' ' + temp_up_y + ' ' + temp_down_x + ' ' +  temp_down_y 
+    
+    result += string_temp + '\n' + temp_up_x + '\n' +  temp_up_y + '\n' +  temp_down_x + '\n' +  temp_down_y + '\n'
+    # end(for text)
+    # print result 
+    
+    return result
+	
 if __name__ == '__main__':
     detect_text('test3.jpg') # 직접 파일 같은데 있다고 가정.

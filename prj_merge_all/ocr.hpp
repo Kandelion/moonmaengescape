@@ -7,7 +7,7 @@ private:
     void get_append_path(char *dest);
 
 public:
-    void detect_text(char * result, int result_size, const char* filepath, const char* pythonname);
     ocr_vision();
     ~ocr_vision();
+    void detect_text(char * result, int result_size, const char* filepath, const char* pythonname);
 };

@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
+#include <thread>
 
 
 #define MAX_STR 4096
@@ -14,9 +15,18 @@
 
 
 void get_filepath(char *str, int count);
-
+int API();
 
 int main(){
+    thread THR(&API);
+
+    THR.join();
+
+    return 0;
+}
+
+
+int API(){
     ocr_vision OCR_;
     translator TR;
     char result_ocr[MAX_STR];
@@ -26,7 +36,7 @@ int main(){
     int img_cnt=1;
     int prev_cnt=1;
     char file_cnt[10]="";
-    char img_name[256] = "%HOME%/Pictures/snap.png";
+    char img_name[256] = "";
     char prev_path[256];
 
     clock_t start, end;
@@ -40,10 +50,8 @@ int main(){
 
     get_filepath(img_name, img_cnt);
 
-    //std::cout<<"Input image name : ";
-    //std::cin>>img_name;
-
-    //std::cout<<std::endl<<"==result=="<<std::endl;
+    int numsv = 0;
+    SV* psv = (SV*)malloc(sizeof(SV) *4096);
 
     while(count>0){
         while(access(img_name, F_OK)==0){
@@ -80,9 +88,14 @@ int main(){
             std::cout<<"# Detected text"<<std::endl;
             std::cout<<result_ocr<<std::endl;
 
-            TR.translate(result_translation, MAX_STR, (const char*)result_ocr);
+            numsv = 0;
+            TR.translate(result_translation, MAX_STR, (const char*)result_ocr, psv, &numsv);
             std::cout<<"# Translated text"<<std::endl;
-            std::cout<<result_translation<<std::endl;
+            //std::cout<<result_translation<<std::endl;
+
+            for(int i = 0; i <numsv ; i++)
+	            printf("%s %d %d %d %d\n", psv[i].str, psv[i].x1,  psv[i].y1, psv[i].x2, psv[i].y2);
+                
             end = clock();
 
             std::cout<<"delay : "<<(1000.0)*(double)(end-start)/CLOCKS_PER_SEC<<endl;

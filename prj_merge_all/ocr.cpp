@@ -4,14 +4,6 @@
 using namespace std;
 #endif
 
-ocr_vision::ocr_vision(){
-    Py_Initialize();
-}
-
-ocr_vision::~ocr_vision(){
-    Py_Finalize();
-}
-
 //array dest require at least 1024 size
 void ocr_vision::get_append_path(char *dest){
     char curdir[1024];
@@ -19,6 +11,14 @@ void ocr_vision::get_append_path(char *dest){
     strncpy(dest, "sys.path.append('", 18);
     strcat(dest, curdir);
     strcat(dest, "')");
+}
+
+ocr_vision::ocr_vision(){
+    Py_Initialize();
+}
+
+ocr_vision::~ocr_vision(){
+    Py_Finalize();
 }
 
 void ocr_vision::detect_text(char* result, int result_size, const char* imgpath, const char* pythonname = "ocr"){
@@ -64,6 +64,5 @@ void ocr_vision::detect_text(char* result, int result_size, const char* imgpath,
             }
             Py_XDECREF(ocr);
         }
-
     }
 }
