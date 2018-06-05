@@ -152,7 +152,7 @@ void translator::translate(char* result, int result_size, const char *src_str, S
 					copyresult.erase(0, pos + delimiter.length());
 					if (count == 0) {
 						if(token.length() != 0)
-							strncpy(psv[*numsv].str, token.c_str(), token.length());
+							strncpy(psv[*numsv].str, token.c_str(), token.length()+1);
 						else 
 							strncpy(psv[*numsv].str, "#", 1);
 					}

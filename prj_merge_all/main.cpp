@@ -65,7 +65,7 @@ int API(){
             get_filepath(img_name, img_cnt);
         }
 
-        img_cnt -= IMG_TERM * 2;
+        img_cnt -= IMG_TERM;// * 2;
 
         if(img_cnt < prev_cnt){
             img_cnt = prev_cnt;
