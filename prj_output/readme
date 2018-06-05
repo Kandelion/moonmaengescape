@@ -1,3 +1,2 @@
 sudo apt-get install gtk+3.0
 sudo apt-get install libgtk-3-dev
-g++ gtk.cpp -o output `pkg-config --cflags --libs gtk+-3.0`

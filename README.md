@@ -36,6 +36,9 @@
 > ```
 > # 2.3 ETC
 > * 번역 부분 개발은 종료되었습니다.
+> * 다음 패키지의 install이 필요합니다.
+> ```
+> $ sudo apt-get install libcurl4-openssl-dev
 
 
 
