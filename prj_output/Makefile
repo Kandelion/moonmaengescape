@@ -1,5 +1,5 @@
 main : main.o output.o
-	g++ -o $@.out `pkg-config --cflags --libs gtk+-3.0` main.o output.o
+	g++ -o $@.out main.o output.o `pkg-config --cflags --libs gtk+-3.0` 
 
 main.o : main.cpp output.cpp output.hpp
 	g++ -c $*.cpp `pkg-config --cflags --libs gtk+-3.0`

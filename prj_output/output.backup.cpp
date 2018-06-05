@@ -8,7 +8,8 @@ void init_output(void) {
 
 int main(int argc, char **argv)
 {
-    gtk_init(&argc, &argv);
+    printf("argc : %d\n", argc);
+    gtk_init(NULL, NULL);
 
 
         // window init setting.

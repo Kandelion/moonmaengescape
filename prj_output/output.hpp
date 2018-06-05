@@ -4,6 +4,7 @@
 #include <gtk/gtk.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 //////////// struct and static funct /////////////////////////////////
 typedef struct _str_and_vertex{
@@ -21,8 +22,6 @@ static gboolean draw(GtkWidget *widget, cairo_t *new_cr, gpointer user_data);
 
 class output{
 public:
-    GtkWidget *window;
-
     void output_init(SV* struct_ptr, int* int_ptr);
     // void screen_changed(GtkWidget *widget, GdkScreen *old_screen, gpointer user_data);
     // gboolean draw(GtkWidget *window, cairo_t *cr, gpointer userdata);
