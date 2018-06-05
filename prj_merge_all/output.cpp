@@ -1,5 +1,12 @@
 #include "output.hpp"
 
+GtkWidget* fixed_container;
+GtkWidget** label;
+
+char data[10] = "TEST BOY";
+int temp = 0;
+gboolean supports_alpha = FALSE;
+
 static void screen_changed(GtkWidget *widget, GdkScreen *old_screen, gpointer userdata)
 {
     // To check if the display supports alpha channels, get the visual 
@@ -76,16 +83,22 @@ void output::output_init(void) { // class에 구현할 아웃푸웃
     printf("start initializing the gtk. \n");
     gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
+    printf("let's go!\n");
     gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
+    printf("let's go!\n");
     gtk_window_set_default_size(GTK_WINDOW(window), 800, 800);
+    printf("let's go!\n");
     gtk_window_set_title(GTK_WINDOW(window), "MoonMaengEscape !");
+    printf("let's go!\n");
     g_signal_connect(G_OBJECT(window), "delete-event", gtk_main_quit, NULL);
 
+    printf("let's go!\n");
     gtk_widget_set_app_paintable(window, TRUE);
 
     gtk_container_add(GTK_CONTAINER(window), fixed_container);
 
 
+    printf("let's go!\n");
     
     g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw), NULL);
     g_signal_connect(G_OBJECT(window), "screen_changed", G_CALLBACK(screen_changed), NULL);
@@ -95,5 +108,6 @@ void output::output_init(void) { // class에 구현할 아웃푸웃
     gtk_window_fullscreen((GtkWindow*)window);
 
     gtk_widget_show_all(window);
+    printf("let's go!\n");
     gtk_main();
 }

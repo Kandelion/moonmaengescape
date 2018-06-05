@@ -1,5 +1,6 @@
 #include "ocr.hpp"
 #include "translator.hpp"
+#include "output.hpp"
 #include <iostream>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -18,8 +19,10 @@ void get_filepath(char *str, int count);
 int API();
 
 int main(){
+    output OPT;
     thread THR(&API);
 
+    OPT.output_init();
     THR.join();
 
     return 0;
