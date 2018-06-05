@@ -15,16 +15,7 @@ static void screen_changed(GtkWidget *widget, GdkScreen *old_screen, gpointer us
 static gboolean draw(GtkWidget *widget, cairo_t *new_cr, gpointer user_data);
 //////////////////////////////////////////////////////////////////////
 
-//////////////////// global variables //////////////////////////////////
-int MAX_LABEL;
-int temp;
-gboolean supports_alpha; //false null null
-SV* s_ptr;
-int* num_ptr;
 
-GtkWidget* fixed_container;
-GtkWidget** label;
-////////////////////////////////////////////////////////////////////////
 
 /////////////////// output class ////////////////////////////
 

@@ -1,5 +1,16 @@
 #include "output.hpp"
 
+//////////////////// global variables //////////////////////////////////
+int MAX_LABEL;
+int temp;
+gboolean supports_alpha; //false null null
+SV* s_ptr;
+int* num_ptr;
+
+GtkWidget* fixed_container;
+GtkWidget** label;
+////////////////////////////////////////////////////////////////////////
+
 static void screen_changed(GtkWidget *widget, GdkScreen *old_screen, gpointer userdata)
 {
     // To check if the display supports alpha channels, get the visual 
