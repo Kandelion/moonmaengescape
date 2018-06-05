@@ -48,14 +48,17 @@ def detect_text(path):
 
 	if parse_list[list_idx].find(text.description) != -1 and len(string_temp) < len(parse_list[list_idx]) :
 		string_temp += text.description
-		temp_down_x = str(text.bounding_poly.vertices[2].x)
-		temp_down_y = str(text.bounding_poly.vertices[2].y)	
+		#temp_down_x = str(text.bounding_poly.vertices[2].x)
+		#temp_down_y = str(text.bounding_poly.vertices[2].y)	
 	else :
 		result += parse_list[list_idx] + '\n' + temp_up_x + '\n' +  temp_up_y + '\n' +  temp_down_x + '\n' +  temp_down_y + '\n'
 		string_temp = text.description
 		temp_up_x = str(text.bounding_poly.vertices[0].x)
 		temp_up_y = str(text.bounding_poly.vertices[0].y)
 		list_idx += 1	
+	temp_down_x = str(text.bounding_poly.vertices[2].x)
+	temp_down_y = str(text.bounding_poly.vertices[2].y)	
+
 	#print temp_up_x +  ' ' + temp_up_y + ' ' + temp_down_x + ' ' +  temp_down_y 
     
     result += string_temp + '\n' + temp_up_x + '\n' +  temp_up_y + '\n' +  temp_down_x + '\n' +  temp_down_y + '\n'
