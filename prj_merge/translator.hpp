@@ -26,7 +26,7 @@ private:
     void getURL(char *URL, const char *str);
 
 public:
-    void translate(char* result, int result_size, const char *src_str);
+    void translate(char* result, int result_size, const char *src_str, SV* psv, int* numsv);
 };
 
 #endif

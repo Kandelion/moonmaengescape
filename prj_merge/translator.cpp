@@ -3,8 +3,8 @@
 const char *JsonField[] = { "translatedText", "detectedSourceLanguage"};
 enum FIELD_NAME { RESULT, SRC_LANG };
 string delimiter = "\n";
-SV sv[4096];
-int numsv = 0;
+//SV sv[4096];
+//int numsv = 0;
 // callback function writes data to a ostream
 size_t translator::data_write(void* buf, size_t size, size_t nmemb, void* userp)
 {
@@ -95,7 +95,7 @@ void translator::getURL(char *URL, const char *str){
 		free(str_cpy);
 }
 
-void translator::translate(char* result, int result_size, const char *src_str)
+void translator::translate(char* result, int result_size, const char *src_str, SV* psv, int* numsv)
 {
 	curl_global_init(CURL_GLOBAL_ALL);
 
@@ -146,27 +146,27 @@ void translator::translate(char* result, int result_size, const char *src_str)
 					token = copyresult.substr(0, pos);
 					count = (count + 1);
 					if(count == 5){
-						numsv++;
+						(*numsv)++;
 						count = count % 5;
 					}
 					copyresult.erase(0, pos + delimiter.length());
 					if (count == 0) {
 						if(token.length() != 0)
-							strncpy(sv[numsv].str, token.c_str(), token.length());
+							strncpy(psv[*numsv].str, token.c_str(), token.length());
 						else 
-							strncpy(sv[numsv].str, "#", 1);
+							strncpy(psv[*numsv].str, "#", 1);
 					}
 					else if(count == 1)
-						sv[numsv].x1 = atoi(token.c_str());
+						psv[*numsv].x1 = atoi(token.c_str());
 					else if(count == 2)
-						sv[numsv].y1 = atoi(token.c_str());
+						psv[*numsv].y1 = atoi(token.c_str());
 					else if(count == 3)
-						sv[numsv].x2 = atoi(token.c_str());
+						psv[*numsv].x2 = atoi(token.c_str());
 					else
-						sv[numsv].y2 = atoi(token.c_str());	
+						psv[*numsv].y2 = atoi(token.c_str());	
 	
 				}
-				numsv++;
+				(*numsv)++;
 				
 				return;
 			}
