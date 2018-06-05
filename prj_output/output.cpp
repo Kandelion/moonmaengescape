@@ -51,6 +51,7 @@ static gboolean draw(GtkWidget *window, cairo_t *cr, gpointer userdata)
 
     printf("drawing Start ! \n");
 
+    /*
     for(int i=0; i<(*num_ptr); i++) {
         if(s_ptr[i].str[0] == NULL) break;
 
@@ -69,7 +70,8 @@ static gboolean draw(GtkWidget *window, cairo_t *cr, gpointer userdata)
         gtk_label_set_markup(GTK_LABEL(label[i]), str_tmp);
         gtk_fixed_move (GTK_FIXED(fixed_container), label[i], s_ptr[i].x, s_ptr[i].y);
     }
-    
+    */
+
     if( temp++ > 1000 ) temp = 0;
 
     printf("drawing End.\n");
@@ -82,6 +84,12 @@ static gboolean draw(GtkWidget *window, cairo_t *cr, gpointer userdata)
 void output::output_init(SV* struct_ptr, int* int_ptr) { // class에 구현할 아웃푸웃
     gtk_init(NULL, NULL);
     fixed_container = gtk_fixed_new();
+
+    temp = 0;
+    MAX_LABEL = 2000;
+    s_ptr = NULL;
+    num_ptr = NULL;
+    supports_alpha = false;
 
     label = (GtkWidget **)malloc(sizeof(GtkWidget*) * MAX_LABEL);
     for(int i=0; i< MAX_LABEL; i++) {
