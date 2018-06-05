@@ -51,7 +51,7 @@ def detect_text(path):
 		temp_down_x = str(text.bounding_poly.vertices[2].x)
 		temp_down_y = str(text.bounding_poly.vertices[2].y)	
 	else :
-		result += string_temp + '\n' + temp_up_x + '\n' +  temp_up_y + '\n' +  temp_down_x + '\n' +  temp_down_y + '\n'
+		result += parse_list[list_idx] + '\n' + temp_up_x + '\n' +  temp_up_y + '\n' +  temp_down_x + '\n' +  temp_down_y + '\n'
 		string_temp = text.description
 		temp_up_x = str(text.bounding_poly.vertices[0].x)
 		temp_up_y = str(text.bounding_poly.vertices[0].y)
