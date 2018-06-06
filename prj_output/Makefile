@@ -7,6 +7,8 @@ main.o : main.cpp output.cpp output.hpp
 output.o : output.cpp output.hpp
 	g++ -c $*.cpp `pkg-config --cflags --libs gtk+-3.0`
 
+clean:
+	rm -rf main.out main.o output.o
 
 #make:
 	#g++ output.cpp -o output.out `pkg-config --cflags --libs gtk+-3.0`

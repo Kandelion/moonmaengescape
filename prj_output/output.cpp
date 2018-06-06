@@ -107,16 +107,18 @@ static gboolean draw(GtkWidget *window, cairo_t *cr, gpointer userdata)
             }
                 // 갱신됨으로써 지워져야 할 텍스트들 초기화.
             else {
-                gtk_fixed_move (GTK_FIXED(fixed_container), label[i], 5000, 5000);
+                gtk_label_set_markup(GTK_LABEL(label[i]), "");
+                //gtk_fixed_move (GTK_FIXED(fixed_container), label[i], 5000, 5000);
             }
         }
         pre_num = numsv;
     }
 
     //printf("drawing End.\n");
+    gtk_fixed_move (GTK_FIXED(fixed_container), label[1500], 5000, 5000); // 호출이 없을 시에 draw 지속 호출을 위한 더미.
 
-    sleep(1);
-
+    //sleep(1);
+    
     return FALSE;
 }
 
