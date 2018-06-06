@@ -23,6 +23,7 @@ struct my_msgbuf
     long msgtype;
     SV data[SV_SIZE];
     int numsv;
+    int dummy[2];
 };
 key_t key_id;
 struct my_msgbuf mybuf;
@@ -78,14 +79,13 @@ static gboolean draw(GtkWidget *window, cairo_t *cr, gpointer userdata)
 
     ///////////////////////////////////////////////////////////////////////////
     
-    //printf("drawing!\n");
-    numsv = 0;
+    printf("drawing!\n");
     receiveMsg(s_ptr, &numsv);
-    //printf("data receive!\n");
+    printf("data receive!\n");
     
     //  merge all 사용시 이 부분 사용.
     if(numsv > 0) {
-        //printf("numsv : %d\n", numsv);
+        printf("numsv : %d\n", numsv);
         int check_length = numsv > pre_num ? numsv : pre_num;
         for(int i = 0; i < check_length; i++) {
                 // 새로 변경된 텍스트 갱신
@@ -102,34 +102,37 @@ static gboolean draw(GtkWidget *window, cairo_t *cr, gpointer userdata)
                 strcat(str_tmp, "</b></span>");
 
                 //gtk_label_set_markup(GTK_LABEL(label[i]), "<span foreground=\"red\" background=\"#00FF007F\" font=\"30.5\"><b>Test Text 1</b></span>");
-                
-                gtk_fixed_move (GTK_FIXED(fixed_container), label[i], s_ptr[i].x1, s_ptr[i].y1);
                 gtk_label_set_markup(GTK_LABEL(label[i]), str_tmp);
+                gtk_fixed_move (GTK_FIXED(fixed_container), label[i], s_ptr[i].x1, s_ptr[i].y1);
             }
                 // 갱신됨으로써 지워져야 할 텍스트들 초기화.
             else {
-                gtk_fixed_move (GTK_FIXED(fixed_container), label[i], 5000, 5000);
+                gtk_label_set_markup(GTK_LABEL(label[i]), "");
+                //gtk_fixed_move (GTK_FIXED(fixed_container), label[i], 5000, 5000);
             }
-
-            printf("%d. %s, X : %d, Y : %d\n", i, s_ptr[i].str, s_ptr[i].x1, s_ptr[i].y1);
         }
         pre_num = numsv;
     }
 
     //printf("drawing End.\n");
-    gtk_fixed_move (GTK_FIXED(fixed_container), label[500], 5000, 5000);
+    gtk_fixed_move (GTK_FIXED(fixed_container), label[1500], 5000, 5000); // 호출이 없을 시에 draw 지속 호출을 위한 더미.
 
-    sleep(1);
-
+    //sleep(1);
+    
     return FALSE;
 }
 
 void output::output_init(SV* struct_ptr, int* int_ptr) { // class에 구현할 아웃푸웃
     temp = 0;
     MAX_LABEL = 2000;
+    //s_ptr = NULL;
+    //num_ptr = NULL;
     supports_alpha = false;
     pre_num = 0;
 
+        // pointer fetching.
+    //s_ptr = struct_ptr;
+    //num_ptr = int_ptr;
     numsv = 0;
     
     init_Msg();
@@ -189,11 +192,11 @@ void receiveMsg(SV *receive_data, int *numsv_){
     int flag=0, rcv_result=0;
 
     //get data from queue.
-    rcv_result = msgrcv( key_id, (void *)&temp_buf, sizeof(temp_buf), 1, IPC_NOWAIT | MSG_NOERROR);
+    rcv_result = msgrcv( key_id, (void *)&temp_buf, sizeof(temp_buf) - 8, 1, IPC_NOWAIT | MSG_NOERROR);
 
     if(rcv_result != -1){
         printf("Copy to local\n");
-        memcpy(receive_data, temp_buf.data, sizeof(SV) * (SV_SIZE-1));
+        memcpy(receive_data, temp_buf.data, sizeof(SV) * (SV_SIZE));
         *numsv_ = temp_buf.numsv;
         printf("rcv_done : %s, %d\n", temp_buf.data[0].str, temp_buf.numsv);
     }
