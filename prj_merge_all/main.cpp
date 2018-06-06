@@ -27,6 +27,7 @@ struct my_msgbuf
     long msgtype;
     SV data[SV_SIZE];
     int numsv;
+    int dummy[2];
 };
 
 SV* psv = NULL;
@@ -179,7 +180,7 @@ void sendMsg(SV *target_data, int numsv_){
     while (msgsnd( key_id, (void *)&mybuf, sizeof(struct my_msgbuf), IPC_NOWAIT) == -1)
     {
         std::cout<<"Queue is full!"<<std::endl;
-        if(msgrcv( key_id, (void *)&temp_buf, sizeof(struct my_msgbuf), 1, IPC_NOWAIT | MSG_NOERROR) == -1)
+        if(msgrcv( key_id, (void *)&temp_buf, sizeof(struct my_msgbuf) - 8, 1, IPC_NOWAIT | MSG_NOERROR) == -1)
             std::cout<<"Error receive!"<<std::endl;
     }
     std::cout<<"send : "<<mybuf.data[0].str<<", "<<mybuf.numsv<<std::endl;
@@ -195,7 +196,7 @@ void receiveMsg(SV *receive_data, int *numsv_){
     //get latest data in queue.
     do
     {
-        rcv_result = msgrcv( key_id, (void *)&temp_buf, sizeof(struct my_msgbuf), 1, IPC_NOWAIT | MSG_NOERROR);
+        rcv_result = msgrcv( key_id, (void *)&temp_buf, sizeof(struct my_msgbuf) - 8, 1, IPC_NOWAIT | MSG_NOERROR);
         flag = 1;
     }while ( (rcv_result == -1 && flag == 0) || rcv_result == 0 );
 

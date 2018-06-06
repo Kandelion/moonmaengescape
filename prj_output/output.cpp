@@ -23,6 +23,7 @@ struct my_msgbuf
     long msgtype;
     SV data[SV_SIZE];
     int numsv;
+    int dummy[2];
 };
 key_t key_id;
 struct my_msgbuf mybuf;
@@ -189,11 +190,11 @@ void receiveMsg(SV *receive_data, int *numsv_){
     int flag=0, rcv_result=0;
 
     //get data from queue.
-    rcv_result = msgrcv( key_id, (void *)&temp_buf, sizeof(temp_buf), 1, IPC_NOWAIT | MSG_NOERROR);
+    rcv_result = msgrcv( key_id, (void *)&temp_buf, sizeof(temp_buf) - 8, 1, IPC_NOWAIT | MSG_NOERROR);
 
     if(rcv_result != -1){
         printf("Copy to local\n");
-        memcpy(receive_data, temp_buf.data, sizeof(SV) * (SV_SIZE-1));
+        memcpy(receive_data, temp_buf.data, sizeof(SV) * (SV_SIZE));
         *numsv_ = temp_buf.numsv;
         printf("rcv_done : %s, %d\n", temp_buf.data[0].str, temp_buf.numsv);
     }
