@@ -2,37 +2,22 @@
 
 static void screen_changed(GtkWidget *widget, GdkScreen *old_screen, gpointer user_data);
 static gboolean draw(GtkWidget *widget, cairo_t *new_cr, gpointer user_data);
-static void clicked(GtkWindow *win, GdkEventButton *event, gpointer user_data);
+void init_output(void) {
+
+}
 
 int main(int argc, char **argv)
 {
-    gtk_init(&argc, &argv);
+    printf("argc : %d\n", argc);
+    gtk_init(NULL, NULL);
 
+
+        // window init setting.
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    GtkWidget *text;
-
-    /*
-    GtkWidget *entry;
-
-    gtk_window_set_title(GTK_WINDOW (window), "GTK Entry");
-    gtk_signal_connect(G_OBJECT (window), "delete_event",
-                       (GtkSignalFunc) gtk_exit, NULL);
-    /////////////////////////////////////////////////////////////////////////
-
-    entry = gtk_entry_new_with_max_length (50);
-    gtk_signal_connect(G_OBJECT(entry), "activate",
-                       GTK_SIGNAL_FUNC(enter_callback),
-                       entry);
-    gtk_entry_set_text (GTK_ENTRY (entry), "hello");
-    gtk_entry_append_text (GTK_ENTRY (entry), " world");
-    gtk_entry_select_region (GTK_ENTRY (entry),
-                             0, GTK_ENTRY(entry)->text_length);
-    gtk_widget_show (entry);
-    */
 
     gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
     gtk_window_set_default_size(GTK_WINDOW(window), 800, 800);
-    gtk_window_set_title(GTK_WINDOW(window), "Alpha Demo");
+    gtk_window_set_title(GTK_WINDOW(window), "MoonMaengEscape !");
     g_signal_connect(G_OBJECT(window), "delete-event", gtk_main_quit, NULL);
 
     gtk_widget_set_app_paintable(window, TRUE);
@@ -40,33 +25,61 @@ int main(int argc, char **argv)
     g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(draw), NULL);
     g_signal_connect(G_OBJECT(window), "screen-changed", G_CALLBACK(screen_changed), NULL);
 
-    gtk_window_set_decorated(GTK_WINDOW(window), FALSE);
-    gtk_widget_add_events(window, GDK_BUTTON_PRESS_MASK);
-    g_signal_connect(G_OBJECT(window), "button-press-event", G_CALLBACK(clicked), NULL);
+        // for freely expressing, use fixed.
 
     GtkWidget* fixed_container = gtk_fixed_new();
     gtk_container_add(GTK_CONTAINER(window), fixed_container);
-    GtkWidget* button = gtk_button_new_with_label("button1");
-    gtk_widget_set_size_request(button, 100, 100);
 
-    /* Create the GtkText widget */
-    /*
-    text = gtk_text_new (NULL, NULL);
-    gtk_text_set_editable (GTK_TEXT (text), TRUE);
-    gtk_table_attach (GTK_TABLE (table), text, 0, 1, 0, 1,
-                    GTK_EXPAND | GTK_SHRINK | GTK_FILL,
-                    GTK_EXPAND | GTK_SHRINK | GTK_FILL, 0, 0);
-    gtk_widget_show (text);
-    */
-    
-    gtk_container_add(GTK_CONTAINER(fixed_container), button);
+        // button test.
+
+    GtkWidget* button = gtk_button_new_with_label("Button Test");
+    gtk_widget_set_size_request(button, 100, 100);   
+    gtk_fixed_put (GTK_FIXED (fixed_container), button, 1080, 720); 
+    //gtk_container_add(GTK_CONTAINER(fixed_container), button);
+
+
+        // label test. pango markup language use. color, fontsize setting.
+
+    GtkWidget* label;
+    label = gtk_label_new (NULL);
+    //gtk_label_set_text (GTK_LABEL (label), "Label Input String");
+    gtk_label_set_markup(GTK_LABEL(label), "<span foreground=\"red\" background=\"#00FF007F\" font=\"30.5\"><b>Test Text 1</b></span>");
+    //gtk_widget_set_size_request(label, 1, -1);
+    //gtk_container_add(GTK_CONTAINER(fixed_container), label);
+    gtk_fixed_put (GTK_FIXED (fixed_container), label, 30, 320); 
+
+
+        // label test. pango markup language use. color, fontsize setting.
+
+    GtkWidget* label2;
+    label2 = gtk_label_new (NULL);
+    //gtk_label_set_text (GTK_LABEL (label2), "YELLOW Input String");
+    gtk_label_set_markup(GTK_LABEL(label2), "<span foreground=\"blue\" font=\"20.5\">Input Text</span> is <i><span font=\"50\">cool</span></i>!");
+    gtk_fixed_put (GTK_FIXED (fixed_container), label2, 430, 120); 
+
+        // entry widget test.
+  
+    GtkWidget* entry = gtk_entry_new ();
+  
+    gtk_widget_set_size_request(entry, 100, -1);
+    gtk_entry_set_text (GTK_ENTRY (entry), "Entry Input Test");
+    gtk_fixed_put (GTK_FIXED (fixed_container), entry, 580, 120); 
+    //gtk_container_add(GTK_CONTAINER(fixed_container), entry);
+
+    printf("Output End1.\n");
 
     screen_changed(window, NULL, NULL);
     gtk_window_fullscreen((GtkWindow*)window);
 
+    printf("Output End2.\n");
+
     gtk_widget_show_all(window);
+    printf("Output End3.\n");
+    gtk_entry_set_text (GTK_ENTRY (entry), "Entry Input Test tttttttttttttt");
+
     gtk_main();
 
+    printf("Output End4.\n");
     return 0;
 }
 
@@ -95,17 +108,18 @@ static void screen_changed(GtkWidget *widget, GdkScreen *old_screen, gpointer us
 static gboolean draw(GtkWidget *widget, cairo_t *cr, gpointer userdata)
 {
    cairo_t *new_cr = gdk_cairo_create(gtk_widget_get_window(widget));
-
+   
     if (supports_alpha)
     {
         // r g b 투명도
-        cairo_set_source_rgba (new_cr, 0.0, 0.0, 0.0, 0.5); /* transparent */
+        cairo_set_source_rgba (new_cr, 0.0, 0.0, 0.0, 0.0); /* transparent */
     }
     else
     {
         cairo_set_source_rgb (new_cr, 1.0, 1.0, 1.0); /* opaque white */
     }
-
+    printf("drawing\n");
+    
     /* draw the background */
     cairo_set_operator (new_cr, CAIRO_OPERATOR_SOURCE);
     cairo_paint (new_cr);
@@ -115,8 +129,3 @@ static gboolean draw(GtkWidget *widget, cairo_t *cr, gpointer userdata)
     return FALSE;
 }
 
-static void clicked(GtkWindow *win, GdkEventButton *event, gpointer user_data)
-{
-    /* toggle window manager frames */
-    gtk_window_set_decorated(win, !gtk_window_get_decorated(win));
-} 

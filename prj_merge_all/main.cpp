@@ -1,6 +1,5 @@
 #include "ocr.hpp"
 #include "translator.hpp"
-#include "output.hpp"
 #include <iostream>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -9,20 +8,41 @@
 #include <errno.h>
 #include <unistd.h>
 #include <thread>
+#include <sys/ipc.h>
+#include <sys/msg.h>
 
 
 #define MAX_STR 4096
 #define IMG_TERM 60
-
+#define SV_SIZE 20
 
 void get_filepath(char *str, int count);
+void init_Msg();
+void sendMsg(SV *target_data, int numsv_);
+void receiveMsg(SV *receive_data, int *numsv_);
 int API();
 
+struct my_msgbuf
+{
+    long msgtype;
+    SV data[SV_SIZE];
+    int numsv;
+};
+
+SV* psv = NULL;
+int numsv = 0;
+key_t key_id;
+struct my_msgbuf mybuf;
+
+
 int main(){
-    output OPT;
+    psv = (SV*)malloc(sizeof(SV) * SV_SIZE);
+    numsv = 0;
+
+    init_Msg();
+
     thread THR(&API);
 
-    OPT.output_init();
     THR.join();
 
     return 0;
@@ -43,7 +63,7 @@ int API(){
     char prev_path[256];
 
     clock_t start, end;
-    int count=3;
+    int count=1;
     char continues=0;
 
     int fd=0;
@@ -52,9 +72,6 @@ int API(){
     prev_cnt = 1;
 
     get_filepath(img_name, img_cnt);
-
-    int numsv = 0;
-    SV* psv = (SV*)malloc(sizeof(SV) *4096);
 
     while(count>0){
         while(access(img_name, F_OK)==0){
@@ -98,6 +115,8 @@ int API(){
 
             for(int i = 0; i <numsv ; i++)
 	            printf("%s %d %d %d %d\n", psv[i].str, psv[i].x1,  psv[i].y1, psv[i].x2, psv[i].y2);
+
+            sendMsg(psv, numsv);
                 
             end = clock();
 
@@ -109,7 +128,7 @@ int API(){
                 std::cout<<"count is 0. C to continue, E to exit : ";
                 std::cin>>continues;
                 if(continues == 'c' || continues == 'C'){
-                    count = 10;
+                    count = 100;
                 }
                 else if(continues == 'e' || continues == 'E'){
                     in.close();
@@ -133,3 +152,54 @@ void get_filepath(char *str, int count){
     strncat(str, file_cnt, 256);
     strncat(str, ".jpg", 256);
 }
+
+
+//////////////// Init MSG queue /////////////////
+void init_Msg(){
+    key_id = msgget((key_t)1234, IPC_CREAT|0666);
+    if (key_id == -1)
+    {
+        perror("msgget error : ");
+        exit(0);
+    }
+}
+//////////////// Init MSG queue /////////////////
+
+
+//////////////// Send MSG queue /////////////////
+void sendMsg(SV *target_data, int numsv_){
+    memcpy(mybuf.data, target_data, sizeof(SV) * SV_SIZE);
+    mybuf.msgtype = 1;
+    mybuf.numsv = numsv_;
+    struct my_msgbuf temp_buf;
+    char d;
+
+    std::cout<<"Try to send!"<<std::endl;
+
+    while (msgsnd( key_id, (void *)&mybuf, sizeof(struct my_msgbuf), IPC_NOWAIT) == -1)
+    {
+        std::cout<<"Queue is full!"<<std::endl;
+        if(msgrcv( key_id, (void *)&temp_buf, sizeof(struct my_msgbuf), 1, IPC_NOWAIT | MSG_NOERROR) == -1)
+            std::cout<<"Error receive!"<<std::endl;
+    }
+    std::cout<<"send : "<<mybuf.data[0].str<<", "<<mybuf.numsv<<std::endl;
+}
+//////////////// Send MSG queue /////////////////
+
+
+//////////////// Receive MSG queue /////////////////
+void receiveMsg(SV *receive_data, int *numsv_){
+    struct my_msgbuf temp_buf;
+    int flag=0, rcv_result=0;
+
+    //get latest data in queue.
+    do
+    {
+        rcv_result = msgrcv( key_id, (void *)&temp_buf, sizeof(struct my_msgbuf), 1, IPC_NOWAIT | MSG_NOERROR);
+        flag = 1;
+    }while ( (rcv_result == -1 && flag == 0) || rcv_result == 0 );
+
+    memcpy(receive_data, temp_buf.data, sizeof(SV) * SV_SIZE);
+    (*numsv_) = temp_buf.numsv;
+}
+//////////////// Receive MSG queue /////////////////

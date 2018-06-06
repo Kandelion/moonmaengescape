@@ -5,13 +5,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "translator.hpp"
+#include <sys/ipc.h>
+#include <sys/msg.h>
 
 //////////// struct and static funct /////////////////////////////////
-/*typedef struct _str_and_vertex{
-	char str[200];
+typedef struct _str_and_vertex{
+	char str[100];
 	int x1, y1, x2, y2;
-}SV;*/
+}SV;
 
 static void screen_changed(GtkWidget *widget, GdkScreen *old_screen, gpointer user_data);
 static gboolean draw(GtkWidget *widget, cairo_t *new_cr, gpointer user_data);

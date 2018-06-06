@@ -1,16 +1,32 @@
 #include "output.hpp"
 
+#define SV_SIZE 20
+
+void init_Msg();
+void receiveMsg(SV *receive_data, int *numsv_);
+
 //////////////////// global variables //////////////////////////////////
 int MAX_LABEL;
 int temp;
 gboolean supports_alpha; //false null null
-SV* s_ptr;
-int* num_ptr;
+SV s_ptr[SV_SIZE];
+int numsv;
 int pre_num;
 
 GtkWidget* window;
 GtkWidget* fixed_container;
 GtkWidget** label;
+
+///// by khw /////
+struct my_msgbuf
+{
+    long msgtype;
+    SV data[SV_SIZE];
+    int numsv;
+};
+key_t key_id;
+struct my_msgbuf mybuf;
+/////////////////
 ////////////////////////////////////////////////////////////////////////
 
 static void screen_changed(GtkWidget *widget, GdkScreen *old_screen, gpointer userdata)
@@ -40,9 +56,9 @@ static gboolean draw(GtkWidget *window, cairo_t *cr, gpointer userdata)
 {
    cairo_t *new_cr = gdk_cairo_create(gtk_widget_get_window(window));
    char str_tmp[300] = { '0', };
-   char font_color[20] = "RED";
-   char bg_color[20] = "#00FF007F";
-   char font_size[20] = "10";
+   char font_color[20] = "WHITE";
+   char bg_color[20] = "#000000DF";
+   char font_size[20] = "20";
 
     if (supports_alpha)
     {
@@ -61,29 +77,18 @@ static gboolean draw(GtkWidget *window, cairo_t *cr, gpointer userdata)
     cairo_destroy(new_cr);
 
     ///////////////////////////////////////////////////////////////////////////
-
-    printf("drawing Start ! \n");
-            // for testing.
-            strcpy(str_tmp, "<span foreground=\"");
-            strcat(str_tmp, font_color);
-            strcat(str_tmp, "\" background=\"");
-            strcat(str_tmp, bg_color);
-            strcat(str_tmp, "\" font=\"");
-            strcat(str_tmp, font_size);
-            strcat(str_tmp, "\"><b>");
-            strcat(str_tmp, "test");
-            strcat(str_tmp, "</b></span>");
     
-            //printf("%s\n", str_tmp);
+    printf("drawing!\n");
+    receiveMsg(s_ptr, &numsv);
+    printf("data receive!\n");
     
-    
-    /*
     //  merge all 사용시 이 부분 사용.
-    if(!num_ptr) {
-        int check_length = (*num_ptr) > pre_num ? *num_ptr : pre_num;
+    if(numsv > 0) {
+        printf("numsv : %d\n", numsv);
+        int check_length = numsv > pre_num ? numsv : pre_num;
         for(int i = 0; i < check_length; i++) {
                 // 새로 변경된 텍스트 갱신
-            if(i < *num_ptr) {
+            if(i < numsv) {
                 //gtk_label_set_markup(GTK_LABEL(label[i]), data);
                 strcpy(str_tmp, "<span foreground=\"");
                 strcat(str_tmp, font_color);
@@ -104,16 +109,8 @@ static gboolean draw(GtkWidget *window, cairo_t *cr, gpointer userdata)
                 gtk_fixed_move (GTK_FIXED(fixed_container), label[i], 5000, 5000);
             }
         }
-        pre_num = *num_ptr;
+        pre_num = numsv;
     }
-    */
-    
-        
-    gtk_label_set_markup(GTK_LABEL(label[0]), str_tmp);
-    gtk_fixed_move (GTK_FIXED(fixed_container), label[0], temp, 500);
-
-    temp += 100;
-    if( temp > 1000 ) temp = 0;
 
     //printf("drawing End.\n");
 
@@ -125,15 +122,17 @@ static gboolean draw(GtkWidget *window, cairo_t *cr, gpointer userdata)
 void output::output_init(SV* struct_ptr, int* int_ptr) { // class에 구현할 아웃푸웃
     temp = 0;
     MAX_LABEL = 2000;
-    s_ptr = NULL;
-    num_ptr = NULL;
+    //s_ptr = NULL;
+    //num_ptr = NULL;
     supports_alpha = false;
     pre_num = 0;
 
         // pointer fetching.
-    s_ptr = struct_ptr;
-    num_ptr = int_ptr;
+    //s_ptr = struct_ptr;
+    //num_ptr = int_ptr;
+    numsv = 0;
     
+    init_Msg();
     gtk_init(NULL, NULL);
 
         // window init setting.
@@ -166,5 +165,40 @@ void output::output_init(SV* struct_ptr, int* int_ptr) { // class에 구현할 �
     gtk_window_fullscreen((GtkWindow*)window);
 
     gtk_widget_show_all(window);
+    printf("almost done.\n");
     gtk_main();
 }
+
+
+//////////////// Init MSG queue /////////////////
+void init_Msg(){
+    key_id = msgget((key_t)1234, IPC_CREAT|0666);
+    if (key_id == -1)
+    {
+        perror("msgget error : ");
+        exit(0);
+    }
+}
+//////////////// Init MSG queue /////////////////
+
+
+
+//////////////// Receive MSG queue /////////////////
+void receiveMsg(SV *receive_data, int *numsv_){
+    struct my_msgbuf temp_buf;
+    int flag=0, rcv_result=0;
+
+    //get data from queue.
+    rcv_result = msgrcv( key_id, (void *)&temp_buf, sizeof(temp_buf), 1, IPC_NOWAIT | MSG_NOERROR);
+
+    if(rcv_result != -1){
+        printf("Copy to local\n");
+        memcpy(receive_data, temp_buf.data, sizeof(SV) * (SV_SIZE-1));
+        *numsv_ = temp_buf.numsv;
+        printf("rcv_done : %s, %d\n", temp_buf.data[0].str, temp_buf.numsv);
+    }
+    else{
+        printf("Nothing to rcv\n");
+    }
+}
+//////////////// Receive MSG queue /////////////////
