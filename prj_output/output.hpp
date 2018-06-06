@@ -5,10 +5,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
 
 //////////// struct and static funct /////////////////////////////////
 typedef struct _str_and_vertex{
-	char str[200];
+	char str[100];
 	int x1, y1, x2, y2;
 }SV;
 
