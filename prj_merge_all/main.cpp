@@ -14,7 +14,7 @@
 
 #define MAX_STR 4096
 #define IMG_TERM 60
-#define SV_SIZE 20
+#define SV_SIZE 50
 
 void get_filepath(char *str, int count);
 void init_Msg();

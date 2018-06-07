@@ -1,6 +1,6 @@
 #include "output.hpp"
 
-#define SV_SIZE 20
+#define SV_SIZE 50
 
 void init_Msg();
 void receiveMsg(SV *receive_data, int *numsv_);
@@ -58,8 +58,9 @@ static gboolean draw(GtkWidget *window, cairo_t *cr, gpointer userdata)
    cairo_t *new_cr = gdk_cairo_create(gtk_widget_get_window(window));
    char str_tmp[300] = { '0', };
    char font_color[20] = "WHITE";
-   char bg_color[20] = "#000000DF";
+   char bg_color[20] = "#00000090";
    char font_size[20] = "20";
+   int y_tmp;
 
     if (supports_alpha)
     {
@@ -79,13 +80,16 @@ static gboolean draw(GtkWidget *window, cairo_t *cr, gpointer userdata)
 
     ///////////////////////////////////////////////////////////////////////////
     
-    printf("drawing!\n");
+    //printf("drawing!\n");
+    numsv = 0;
     receiveMsg(s_ptr, &numsv);
-    printf("data receive!\n");
+    //printf("data receive!\n");
     
     //  merge all 사용시 이 부분 사용.
     if(numsv > 0) {
-        printf("numsv : %d\n", numsv);
+        //printf("numsv : %d\n", numsv);
+        printf("y1 : %d , y2 : %d\n", s_ptr[0].y1, s_ptr[0].y2);
+        printf("font size : %d\n", (s_ptr[0].y2 - s_ptr[0].y1));
         int check_length = numsv > pre_num ? numsv : pre_num;
         for(int i = 0; i < check_length; i++) {
                 // 새로 변경된 텍스트 갱신
@@ -96,6 +100,9 @@ static gboolean draw(GtkWidget *window, cairo_t *cr, gpointer userdata)
                 strcat(str_tmp, "\" background=\"");
                 strcat(str_tmp, bg_color);
                 strcat(str_tmp, "\" font=\"");
+
+                sprintf(font_size, "%d", (int)((double)((s_ptr[i].y2 - s_ptr[i].y1)) * 0.9));
+                printf("%s\n", font_size);
                 strcat(str_tmp, font_size);
                 strcat(str_tmp, "\"><b>");
                 strcat(str_tmp, s_ptr[i].str);
@@ -103,9 +110,11 @@ static gboolean draw(GtkWidget *window, cairo_t *cr, gpointer userdata)
 
                 //gtk_label_set_markup(GTK_LABEL(label[i]), "<span foreground=\"red\" background=\"#00FF007F\" font=\"30.5\"><b>Test Text 1</b></span>");
                 gtk_label_set_markup(GTK_LABEL(label[i]), str_tmp);
-                gtk_fixed_move (GTK_FIXED(fixed_container), label[i], s_ptr[i].x1, s_ptr[i].y1);
+                y_tmp = s_ptr[i].y1;
+                if(s_ptr[i].y1 > 10) y_tmp -= 10; 
+                gtk_fixed_move (GTK_FIXED(fixed_container), label[i], s_ptr[i].x1, s_ptr[i].y1 - 10);
             }
-                // 갱신됨으로써 지워져야 할 텍스트들 초기화.
+                // 갱신됨으로써 지워져야 할 텍스트들 초기화.t
             else {
                 gtk_label_set_markup(GTK_LABEL(label[i]), "");
                 //gtk_fixed_move (GTK_FIXED(fixed_container), label[i], 5000, 5000);
@@ -125,14 +134,9 @@ static gboolean draw(GtkWidget *window, cairo_t *cr, gpointer userdata)
 void output::output_init(SV* struct_ptr, int* int_ptr) { // class에 구현할 아웃푸웃
     temp = 0;
     MAX_LABEL = 2000;
-    //s_ptr = NULL;
-    //num_ptr = NULL;
     supports_alpha = false;
     pre_num = 0;
 
-        // pointer fetching.
-    //s_ptr = struct_ptr;
-    //num_ptr = int_ptr;
     numsv = 0;
     
     init_Msg();
@@ -195,13 +199,13 @@ void receiveMsg(SV *receive_data, int *numsv_){
     rcv_result = msgrcv( key_id, (void *)&temp_buf, sizeof(temp_buf) - 8, 1, IPC_NOWAIT | MSG_NOERROR);
 
     if(rcv_result != -1){
-        printf("Copy to local\n");
+        //printf("Copy to local\n");
         memcpy(receive_data, temp_buf.data, sizeof(SV) * (SV_SIZE));
         *numsv_ = temp_buf.numsv;
-        printf("rcv_done : %s, %d\n", temp_buf.data[0].str, temp_buf.numsv);
+        //printf("rcv_done : %s, %d\n", temp_buf.data[0].str, temp_buf.numsv);
     }
     else{
-        printf("Nothing to rcv\n");
+        //printf("Nothing to rcv\n");
     }
 }
 //////////////// Receive MSG queue /////////////////
